@@ -1,3 +1,59 @@
+- id: '1632751875079'
+  alias: Energy - Set Boiler Block Level "None"
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.electricity_price
+    attribute: price_level
+    to: NORMAL
+  - platform: state
+    entity_id: sensor.electricity_price
+    attribute: price_level
+    to: CHEAP
+  - platform: state
+    entity_id: sensor.electricity_price
+    attribute: price_level
+    to: VERY_CHEAP
+  condition: []
+  action:
+  - service: select.select_option
+    target:
+      entity_id: select.effect_block_level
+    data:
+      option: None
+  mode: single
+- id: '1632751941146'
+  alias: Energy - Set Boiler Block Level "B"
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.electricity_price
+    attribute: price_level
+    to: EXPENSIVE
+  condition: []
+  action:
+  - service: select.select_option
+    target:
+      entity_id: select.effect_block_level
+    data:
+      option: B
+  mode: single
+- id: '1632751993461'
+  alias: Energy - Set Boiler Block Level "A+B"
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.electricity_price
+    attribute: price_level
+    to: VERY_EXPENSIVE
+  condition: []
+  action:
+  - service: select.select_option
+    target:
+      entity_id: select.effect_block_level
+    data:
+      option: A+B
+  mode: single
 - id: '1636110002543'
   alias: Heating - Boiler Temporarily Unblock
   description: Temporarily unblock electrical heating in boiler when boiler temperature

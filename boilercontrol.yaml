@@ -1,0 +1,145 @@
+# Basic config
+
+substitutions:
+  device_name: BoilerControl
+
+esphome:
+  name: boilercontrol
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: !secret wifi_iot_ssid
+  password: !secret wifi_iot_pass
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${device_name} Hotspot
+    password: !secret hotspot_pass
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+# Enable OTA updates
+ota:
+
+# Enable Web server (optional).
+web_server:
+  port: 80
+  auth:
+    username: !secret webserver_user
+    password: !secret webserver_pass
+
+# Text sensors with general information.
+text_sensor:
+  # Expose ESPHome version as sensor.
+  - platform: version
+    name: ${device_name} ESPHome Version
+  # Expose WiFi information as sensors.
+  - platform: wifi_info
+    ip_address:
+      name: ${device_name} IP
+    ssid:
+      name: ${device_name} SSID
+    bssid:
+      name: ${device_name} BSSID
+
+# Sensors with general information.
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${device_name} Uptime
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: ${device_name} WiFi Signal
+    update_interval: 60s
+
+  - platform: dallas
+    address: 0xB53CFFE076D49828
+    id: temp01
+    name: Radiator Return Temperature
+    internal: false
+  - platform: dallas
+    address: 0x6B3CFFE076653828
+    id: temp02
+    name: Boiler Temperature
+    internal: false
+  - platform: dallas
+    address: 0x393C01D0754B7A28
+    id: temp03
+    name: Air Out Temperature
+    internal: false
+  - platform: dallas
+    address: 0x523C01E07682CF28
+    id: temp04
+    name: Radiator Inflow Temperature
+    internal: false
+  - platform: dallas
+    address: 0x543C01E076FBBF28
+    id: temp05
+    name: Air In Temperature
+    internal: false
+
+  - platform: template
+    id: airtempdelta
+    name: Boiler Air Temp Delta
+    unit_of_measurement: °C
+    update_interval: 60s
+    lambda: 'return id(temp05).state - id(temp03).state;'
+  - platform: template
+    id: radiatortempdelta
+    name: Boiler Radiator WaterTemp Delta
+    unit_of_measurement: °C
+    update_interval: 60s
+    lambda: 'return id(temp04).state - id(temp01).state;'
+
+dallas:
+  pin: GPIO2
+
+select:
+  - platform: template
+    name: "Effect Block Level"
+    id: effect_block_level
+    options:
+      - "None"
+      - "A"
+      - "B"
+      - "A+B"
+    initial_option: None
+    restore_value: true
+    optimistic: true
+    on_value:
+      then:
+        lambda: |-
+          if ((id(effect_block_level).state == "None")) {
+            id(block_relay_a).turn_off();
+            id(block_relay_b).turn_off(); }
+          else if ((id(effect_block_level).state == "A")) {
+            id(block_relay_a).turn_on();
+            id(block_relay_b).turn_off(); }
+          else if ((id(effect_block_level).state == "B")) {
+            id(block_relay_a).turn_off();
+            id(block_relay_b).turn_on(); }
+          else if ((id(effect_block_level).state == "A+B")) {
+            id(block_relay_a).turn_on();
+            id(block_relay_b).turn_on(); }
+
+switch:
+  - platform: gpio
+    name: "Block Relay A"
+    id: block_relay_a
+    pin: GPIO4
+    inverted: yes
+    internal: true
+  - platform: gpio
+    name: "Block Relay B"
+    id: block_relay_b
+    pin: GPIO5
+    inverted: yes
+    internal: true

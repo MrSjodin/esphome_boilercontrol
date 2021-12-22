@@ -9,8 +9,8 @@ esphome:
   board: nodemcuv2
 
 wifi:
-  ssid: !secret wifi_iot_ssid
-  password: !secret wifi_iot_pass
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -66,22 +66,22 @@ sensor:
     name: Radiator Return Temperature
     internal: false
   - platform: dallas
-    address: 0x6B3CFFE076653828
+    address: [Dallas Address]
     id: temp02
     name: Boiler Temperature
     internal: false
   - platform: dallas
-    address: 0x393C01D0754B7A28
+    address: [Dallas Address]
     id: temp03
     name: Air Out Temperature
     internal: false
   - platform: dallas
-    address: 0x523C01E07682CF28
+    address: [Dallas Address]
     id: temp04
     name: Radiator Inflow Temperature
     internal: false
   - platform: dallas
-    address: 0x543C01E076FBBF28
+    address: [Dallas Address]
     id: temp05
     name: Air In Temperature
     internal: false
@@ -100,7 +100,7 @@ sensor:
     lambda: 'return id(temp04).state - id(temp01).state;'
 
 dallas:
-  pin: GPIO2
+  pin: [GPIO PIN ID]
 
 select:
   - platform: template
@@ -134,12 +134,12 @@ switch:
   - platform: gpio
     name: "Block Relay A"
     id: block_relay_a
-    pin: GPIO4
+    pin: [GPIO PIN ID]
     inverted: yes
     internal: true
   - platform: gpio
     name: "Block Relay B"
     id: block_relay_b
-    pin: GPIO5
+    pin: [GPIO PIN ID]
     inverted: yes
     internal: true

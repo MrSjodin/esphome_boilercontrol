@@ -1,0 +1,42 @@
+- id: '1636110002543'
+  alias: Heating - Boiler Temporarily Unblock
+  description: Temporarily unblock electrical heating in boiler when boiler temperature
+    falls below certain level - given that radiator out temp is over a certain level.
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.boiler_temperature
+    below: '40'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+      milliseconds: 0
+  condition:
+  - condition: numeric_state
+    entity_id: sensor.boiler_temp_radiator_inflow
+    above: '26'
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: select.effect_block_level
+      state: A+B
+  action:
+  - service: select.select_option
+    target:
+      entity_id: select.effect_block_level
+    data:
+      option: A
+  - wait_template: ''
+    timeout: 00:20:00
+  - condition: state
+    entity_id: input_boolean.energy_block_highconsumers
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.boiler_temperature
+    above: '48'
+  - service: select.select_option
+    target:
+      entity_id: select.effect_block_level
+    data:
+      option: A+B
+  mode: single

@@ -1,1 +1,1 @@
-# esphome_boilercontrol
+# Control a boiler with effect block inputs
